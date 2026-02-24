@@ -8,6 +8,10 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from app.resources.swaggerConfig import SwaggerConfig
 from app.routes import api_routes, auth_routes, topic_routes, market_routes, event_routes, community_routes, user_routes, appointment_routes
 from app import db, bcrypt, migrate, mail
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -30,7 +34,7 @@ jwt.init_app(app)
 mail.init_app(app)
 
 # Enable CORS
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 # Initialize API
 api = Api(app, prefix=prefix, catch_all_404s=True)
@@ -61,6 +65,11 @@ app.register_blueprint(user_routes.bp, url_prefix=prefix)
 app.register_blueprint(appointment_routes.bp, url_prefix=prefix)
 
 api.add_resource(SwaggerConfig, '/swagger-config')
+
+
+# Create database tables within context
+with app.app_context():
+    db.create_all()
 
 # Error handlers
 
