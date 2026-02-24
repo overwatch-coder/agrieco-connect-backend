@@ -7,9 +7,6 @@
   "servers": [
     {
       "url": "http://localhost:5000/api"
-    },
-    {
-      "url": "https://agrieco-connect-backend.vercel.app/api"
     }
   ],
   "tags": [

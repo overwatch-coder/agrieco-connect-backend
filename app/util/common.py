@@ -9,8 +9,8 @@ class ENVIRONMENT:
         dotenv_path = os.path.join(project_dir, '.env')
         dotenv.load_dotenv(dotenv_path)
         self.domain = os.getenv("DOMAIN") or '0.0.0.0'
-        # self.port = os.getenv("PORT") or 443
-        self.port = 443
+        self.port = os.getenv("PORT") or 5000
+        # self.port = 5000
         self.prefix = os.getenv("PREFIX") or '/api'
 
     def get_instance(self):
@@ -40,9 +40,7 @@ def build_swagger_config_json():
         config_data = json.load(file)
 
     config_data['servers'] = [
-        {"url": f"http://localhost:{port}{prefix}"},
-        # {"url": f"https://{domain}:{port}{prefix}"}
-        {"url": f"https://agrieco-connect-backend.vercel.app{prefix}"}
+        {"url": f"{domain}{prefix}"}
     ]
 
     new_config_file_path = 'app/public/swagger/config.json'

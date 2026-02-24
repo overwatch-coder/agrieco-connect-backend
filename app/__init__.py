@@ -16,20 +16,21 @@ bcrypt = Bcrypt()
 migrate = Migrate()
 mail = Mail()
 
+
 def create_app():
     app = Flask(__name__)
-    
+
     # Load configuration
     app.config.from_object(Config)
 
     # Flask-Mail configuration
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com' 
-    app.config['MAIL_PORT'] = 587 
-    app.config['MAIL_USE_TLS'] = True 
-    app.config['MAIL_USERNAME'] = 'jossynationworld@gmail.com' 
-    app.config['MAIL_PASSWORD'] = 'qekxlvlqhsfvkigk' 
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = 'jossynationworld@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'qekxlvlqhsfvkigk'
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
-    
+
     # Initialize extensions
     db.init_app(app)
     bcrypt.init_app(app)
@@ -47,8 +48,8 @@ def create_app():
     build_swagger_config_json()
     swaggerui_blueprint = get_swaggerui_blueprint(
         prefix,
-        # f'{domain}:{port}{prefix}/swagger-config',
-        f'https://agrieco-connect-backend.vercel.app{prefix}/swagger-config',
+        f'{domain}{prefix}/swagger-config',
+        # f'https://agrieco-connect-backend.vercel.app{prefix}/swagger-config',
         config={
             'app_name': "Agrieco Connect API",
             "layout": "BaseLayout",
@@ -57,7 +58,7 @@ def create_app():
     )
 
     app.register_blueprint(swaggerui_blueprint)
-    
+
     # Register blueprints
     from .routes import api_routes, auth_routes, topic_routes, market_routes, event_routes, community_routes, user_routes, appointment_routes
     app.register_blueprint(api_routes.bp, url_prefix=prefix)
@@ -77,17 +78,16 @@ def create_app():
         response = jsonify({"message": str(e)})
         response.status_code = 404
         return response
-    
+
     @app.errorhandler(MethodNotAllowed)
     def handle_method_not_allowed_error(e):
         response = jsonify({"message": str(e)})
         response.status_code = 405
         return response
-    
+
     @app.route('/')
     def redirect_to_prefix():
         if app.config['PREFIX'] != '':
             return redirect(app.config['PREFIX'])
-        
-    
+
     return app
