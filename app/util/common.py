@@ -42,7 +42,7 @@ def build_swagger_config_json():
     config_data['servers'] = [
         {"url": f"http://localhost:{port}{prefix}"},
         # {"url": f"https://{domain}:{port}{prefix}"}
-        {"url": f"https://agrieco-connect-be.azurewebsites.net{prefix}"}
+        {"url": f"https://agrieco-connect-backend.vercel.app{prefix}"}
     ]
 
     new_config_file_path = 'app/static/swagger/config.json'

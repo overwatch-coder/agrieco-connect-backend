@@ -19,7 +19,7 @@ class TrendingKeywords:
 
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {
                         "role": "system",
@@ -65,7 +65,7 @@ class TrendingKeywords:
     def get_random_facts(self):
         try:
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {
                         "role": "system",
