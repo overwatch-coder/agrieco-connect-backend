@@ -30,7 +30,7 @@ jwt.init_app(app)
 mail.init_app(app)
 
 # Enable CORS
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Initialize API
 api = Api(app, prefix=prefix, catch_all_404s=True)

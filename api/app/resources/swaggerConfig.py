@@ -5,6 +5,6 @@ import json
 
 class SwaggerConfig(Resource):
     def get(self):
-        with open('app/public/swagger/config.json', 'r') as config_file:
+        with open('api/app/public/swagger/config.json', 'r') as config_file:
             config_data = json.load(config_file)
         return jsonify(config_data)
