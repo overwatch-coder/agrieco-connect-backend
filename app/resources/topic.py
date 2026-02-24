@@ -9,10 +9,12 @@ from app.models import Topic
 class TopicsGETResource(Resource):
     def get(self):
         return [topic.serialize() for topic in Topic.query.all()]
-    
+
+
 class TopicsPOSTResource(Resource):
     def post(self):
-        result = jwt_required()(self._post)()  # Applying decorator directly and calling wrapped method
+        # Applying decorator directly and calling wrapped method
+        result = jwt_required()(self._post)()
         return result
 
     def _post(self):
@@ -26,14 +28,15 @@ class TopicsPOSTResource(Resource):
         db.session.add(new_topic)
         db.session.commit()
         return new_topic.serialize(), 201
-    
+
+
 class TopicResource(Resource):
     def get(self, id):
         topic = Topic.query.get(id)
         if topic:
             return topic.serialize()
         return None
-    
+
     @jwt_required()
     def put(self, id):
         user_id = get_jwt_identity()
@@ -49,6 +52,7 @@ class TopicResource(Resource):
             db.session.commit()
             return topic.serialize()
         return None
+
     @jwt_required()
     def delete(self, id):
         user_id = get_jwt_identity()
@@ -60,4 +64,3 @@ class TopicResource(Resource):
             db.session.commit()
             return "", 204
         return None
-    

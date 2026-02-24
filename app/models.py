@@ -1,38 +1,51 @@
-from . import db, bcrypt
+from app import db, bcrypt
 from datetime import datetime, timedelta
 from random import choice
 
 # Define the association table for the many-to-many relationship between User and Topic
 user_topics = db.Table('user_topics',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('topic_id', db.Integer, db.ForeignKey('topics.id'), primary_key=True)
-)
+                       db.Column('user_id', db.Integer, db.ForeignKey(
+                           'users.id'), primary_key=True),
+                       db.Column('topic_id', db.Integer, db.ForeignKey(
+                           'topics.id'), primary_key=True)
+                       )
 
 # Define the association table for the many-to-many relationship between Feed and Topic
 feed_topics = db.Table('feed_topics',
-    db.Column('feed_id', db.Integer, db.ForeignKey('feeds.id'), primary_key=True),
-    db.Column('topic_id', db.Integer, db.ForeignKey('topics.id'), primary_key=True)
-)
+                       db.Column('feed_id', db.Integer, db.ForeignKey(
+                           'feeds.id'), primary_key=True),
+                       db.Column('topic_id', db.Integer, db.ForeignKey(
+                           'topics.id'), primary_key=True)
+                       )
 
 feed_likes = db.Table('feed_likes',
-    db.Column('feed_id', db.Integer, db.ForeignKey('feeds.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
+                      db.Column('feed_id', db.Integer, db.ForeignKey(
+                          'feeds.id'), primary_key=True),
+                      db.Column('user_id', db.Integer, db.ForeignKey(
+                          'users.id'), primary_key=True)
+                      )
 
 user_communities = db.Table('user_communities',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('community_id', db.Integer, db.ForeignKey('communities.id'), primary_key=True)
-)
+                            db.Column('user_id', db.Integer, db.ForeignKey(
+                                'users.id'), primary_key=True),
+                            db.Column('community_id', db.Integer, db.ForeignKey(
+                                'communities.id'), primary_key=True)
+                            )
 
 follows = db.Table('follows',
-    db.Column('follower_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('followed_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
+                   db.Column('follower_id', db.Integer, db.ForeignKey(
+                       'users.id'), primary_key=True),
+                   db.Column('followed_id', db.Integer, db.ForeignKey(
+                       'users.id'), primary_key=True)
+                   )
 
 event_attendees = db.Table('event_attendees',
-    db.Column('event_id', db.Integer, db.ForeignKey('events.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
-)
+                           db.Column('event_id', db.Integer, db.ForeignKey(
+                               'events.id'), primary_key=True),
+                           db.Column('user_id', db.Integer, db.ForeignKey(
+                               'users.id'), primary_key=True)
+                           )
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -46,15 +59,18 @@ class User(db.Model):
     reset_code = db.Column(db.String(32), nullable=True)
     reset_code_expires_at = db.Column(db.DateTime, nullable=True)
     products = db.relationship('Product', backref='user', lazy=True)
-    interested_topics = db.relationship('Topic', secondary=user_topics, backref=db.backref('interested_users', lazy=True), lazy=True)
-    likes = db.relationship('Feed', secondary=feed_likes, backref=db.backref('liked_by', lazy='dynamic'), overlaps="liked_by,likes")
+    interested_topics = db.relationship('Topic', secondary=user_topics, backref=db.backref(
+        'interested_users', lazy=True), lazy=True)
+    likes = db.relationship('Feed', secondary=feed_likes, backref=db.backref(
+        'liked_by', lazy='dynamic'), overlaps="liked_by,likes")
     password_hash = db.Column(db.String(128), nullable=False)
-    
+
     following = db.relationship(
         'User', secondary=follows,
         primaryjoin=id == follows.c.follower_id,
         secondaryjoin=id == follows.c.followed_id,
-        backref=db.backref('followers', lazy='dynamic'),  # Changed 'followed_by' to 'followers'
+        # Changed 'followed_by' to 'followers'
+        backref=db.backref('followers', lazy='dynamic'),
         lazy='dynamic'
     )
 
@@ -70,14 +86,15 @@ class User(db.Model):
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password_hash, password)
-    
+
     def generate_reset_code(self):
-        code = ''.join(choice('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(32))
+        code = ''.join(choice(
+            '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(32))
         self.reset_code = code
         self.reset_code_expires_at = datetime.utcnow() + timedelta(minutes=30)
         db.session.commit()
         return code
-    
+
     def check_reset_code(self, code):
         if self.reset_code == code and self.reset_code_expires_at > datetime.utcnow():
             return True
@@ -94,7 +111,7 @@ class User(db.Model):
             "owned_communities": [community.serialize() for community in self.owned_communities],
             "member_communities": [community.serialize() for community in self.member_communities]
         }
-    
+
     def serialize_with_token(self, token):
         return {
             "id": self.id,
@@ -105,7 +122,7 @@ class User(db.Model):
             "interested_topics": [topic.serialize() for topic in self.interested_topics],
             "token": token
         }
-    
+
     def serialize_less_sensitive(self):
         return {
             "id": self.id,
@@ -114,7 +131,7 @@ class User(db.Model):
             "email": self.email,
             "followers": self.followers.count(),  # Changed 'followed_by' to 'followers'
         }
-    
+
     def followUnfollow(self, user):
         if self.is_following(user):
             self.following.remove(user)
@@ -125,12 +142,14 @@ class User(db.Model):
     def is_following(self, user):
         return self.following.filter(follows.c.followed_id == user.id).count() > 0
 
+
 class Topic(db.Model):
     __tablename__ = 'topics'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    feeds = db.relationship('Feed', secondary=feed_topics, backref=db.backref('feed_topics', lazy=True), lazy=True, overlaps="feed_topics,feeds")
+    feeds = db.relationship('Feed', secondary=feed_topics, backref=db.backref(
+        'feed_topics', lazy=True), lazy=True, overlaps="feed_topics,feeds")
 
     def __init__(self, name, description=None):
         self.name = name
@@ -143,25 +162,31 @@ class Topic(db.Model):
             "description": self.description
         }
 
+
 class Feed(db.Model):
     __tablename__ = 'feeds'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    community_id = db.Column(db.Integer, db.ForeignKey('communities.id'), nullable=True)  # Allow null for feeds not under a community
+    community_id = db.Column(db.Integer, db.ForeignKey(
+        'communities.id'), nullable=True)  # Allow null for feeds not under a community
     content = db.Column(db.Text, nullable=False)
     images = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
-    topics = db.relationship('Topic', secondary=feed_topics, backref=db.backref('topic_feeds', lazy=True), lazy=True, overlaps="feed_topics,feeds")
+    topics = db.relationship('Topic', secondary=feed_topics, backref=db.backref(
+        'topic_feeds', lazy=True), lazy=True, overlaps="feed_topics,feeds")
     comments = db.relationship('Comment', backref='feed', lazy=True)
-    likes = db.relationship('User', secondary=feed_likes, backref=db.backref('liked_feeds', lazy='dynamic'), overlaps="liked_by,likes")
-    community = db.relationship('Community', backref=db.backref('feeds', lazy=True))  # Relationship to Community
-
+    likes = db.relationship('User', secondary=feed_likes, backref=db.backref(
+        'liked_feeds', lazy='dynamic'), overlaps="liked_by,likes")
+    community = db.relationship('Community', backref=db.backref(
+        'feeds', lazy=True))  # Relationship to Community
 
     def __repr__(self):
         return f'<Feed {self.id}>'
-    
+
     def __init__(self, content, user_id, images=None):
         self.content = content
         self.user_id = user_id
@@ -180,15 +205,18 @@ class Feed(db.Model):
             "likes": [user.serialize_less_sensitive() for user in self.likes],
             "comments": [comment.serialize() for comment in self.comments]
         }
-    
+
+
 class Comment(db.Model):
     __tablename__ = 'comments'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     feed_id = db.Column(db.Integer, db.ForeignKey('feeds.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, content, user_id, feed_id):
@@ -206,13 +234,15 @@ class Comment(db.Model):
             "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
             "is_active": self.is_active
         }
-    
+
+
 class Like(db.Model):
     __tablename__ = 'likes'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     feed_id = db.Column(db.Integer, db.ForeignKey('feeds.id'), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
 
     def __init__(self, user_id, feed_id):
         self.user_id = user_id
@@ -225,7 +255,7 @@ class Like(db.Model):
             "feed_id": self.feed_id,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%M:%S")
         }
-    
+
 
 class Product(db.Model):
     __tablename__ = 'products'
@@ -236,8 +266,10 @@ class Product(db.Model):
     image = db.Column(db.Text, nullable=True)
     seller_information = db.Column(db.Text, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, name, price, user_id, seller_information=None, description=None, image=None):
@@ -261,7 +293,7 @@ class Product(db.Model):
             "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
             "is_active": self.is_active
         }
-    
+
 
 class Event(db.Model):
     __tablename__ = 'events'
@@ -274,10 +306,13 @@ class Event(db.Model):
     location = db.Column(db.String(120), nullable=True)
     price = db.Column(db.Float, nullable=True)
     image = db.Column(db.Text, nullable=True)
-    attendees = db.relationship('User', secondary=event_attendees, backref=db.backref('attending_events', lazy=True), lazy=True)
+    attendees = db.relationship('User', secondary=event_attendees, backref=db.backref(
+        'attending_events', lazy=True), lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, title, start_time, end_time, start_date, location, user_id, description=None, price=None, image=None):
@@ -307,7 +342,8 @@ class Event(db.Model):
             "updated_at": self.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
             "is_active": self.is_active
         }
-    
+
+
 class Community(db.Model):
     __tablename__ = 'communities'
     id = db.Column(db.Integer, primary_key=True)
@@ -315,12 +351,15 @@ class Community(db.Model):
     category = db.Column(db.String(80), nullable=True)
     location = db.Column(db.String(120), nullable=True)
     description = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     owner = db.relationship('User', backref='owned_communities', lazy=True)
-    members = db.relationship('User', secondary=user_communities, backref=db.backref('member_communities', lazy=True), lazy=True)
+    members = db.relationship('User', secondary=user_communities, backref=db.backref(
+        'member_communities', lazy=True), lazy=True)
     # feeds = db.relationship('Feed', backref='community', lazy=True)
 
     def __init__(self, name, owner_id, description=None, category=None, location=None):
@@ -345,6 +384,7 @@ class Community(db.Model):
             "member_ids": [member.id for member in self.members]
         }
 
+
 class AppointmentAvailability(db.Model):
     __tablename__ = 'appointment_availabilities'
     id = db.Column(db.Integer, primary_key=True)
@@ -359,8 +399,10 @@ class AppointmentAvailability(db.Model):
     bio = db.Column(db.Text, nullable=True)
     is_booked = db.Column(db.Boolean, nullable=False, default=False)
     booked_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False,
+                           default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, user_id, availability_slot_start, availability_slot_end, company_name=None, specialty=None, location=None, experience_level=None, contact_information=None, bio=None):
@@ -391,6 +433,7 @@ class AppointmentAvailability(db.Model):
             "is_active": self.is_active,
             "is_booked": self.is_booked
         }
+
 
 class Test(db.Model):
     __tablename__ = 'tests'

@@ -4,13 +4,16 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models import Community, Feed, User
 
+
 class CommunitiesGETResource(Resource):
     def get(self):
         return [community.serialize() for community in Community.query.all()]
-    
+
+
 class CommunitiesPOSTResource(Resource):
     def post(self):
-        result = jwt_required()(self._post)()  # Applying decorator directly and calling wrapped method
+        # Applying decorator directly and calling wrapped method
+        result = jwt_required()(self._post)()
         return result
 
     def _post(self):
@@ -21,7 +24,8 @@ class CommunitiesPOSTResource(Resource):
             description = data.get('description')
             location = data.get('location')
             category = data.get('category')
-            new_community = Community(name=name, description=description, location=location, category=category, owner_id=user_id)
+            new_community = Community(
+                name=name, description=description, location=location, category=category, owner_id=user_id)
             # add user to community
             user = User.query.get(user_id)
             new_community.members.append(user)
@@ -31,14 +35,15 @@ class CommunitiesPOSTResource(Resource):
         except Exception as e:
             print("Error: ", e)
             return {"message": "Invalid request"}, 400
-        
+
+
 class CommunityResource(Resource):
     def get(self, id):
         community = Community.query.get(id)
         if community:
             return community.serialize()
         return None
-    
+
     @jwt_required()
     def put(self, id):
         try:
@@ -58,7 +63,7 @@ class CommunityResource(Resource):
         except Exception as e:
             print("Error: ", e)
             return {"message": "Invalid request"}, 400
-        
+
     @jwt_required()
     def delete(self, id):
         user_id = get_jwt_identity()
@@ -71,13 +76,14 @@ class CommunityResource(Resource):
             return "", 204
         return None
 
+
 class CommunityGETMembersResource(Resource):
     def get(self, id):
         community = Community.query.get(id)
         if community:
             return [member.serialize() for member in community.members]
         return None
-    
+
 
 class CommunityPUTMembersResource(Resource):
     @jwt_required()
@@ -93,19 +99,22 @@ class CommunityPUTMembersResource(Resource):
                 db.session.commit()
                 return {"message": "User added to community"}, 200
         return None
-    
+
+
 class CommunityGETMyCommunitiesResource(Resource):
     @jwt_required()
     def get(self):
         user_id = get_jwt_identity()
         user = User.query.get(user_id)
-        
+
         if not user:
             return {"message": "User not found"}, 404
 
-        member_communities = [community.serialize() for community in user.member_communities]
+        member_communities = [community.serialize()
+                              for community in user.member_communities]
         return jsonify(member_communities)
-    
+
+
 class CommunityFeedsResource(Resource):
     @jwt_required(optional=True)
     def get(self, id):
@@ -113,8 +122,6 @@ class CommunityFeedsResource(Resource):
         if not community:
             return {"message": "Community not found"}, 404
 
-        feeds = Feed.query.filter_by(community_id=id).order_by(Feed.created_at.desc()).all()
+        feeds = Feed.query.filter_by(community_id=id).order_by(
+            Feed.created_at.desc()).all()
         return jsonify([feed.serialize() for feed in feeds])
-    
-
-

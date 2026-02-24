@@ -7,8 +7,9 @@ from app.models import User, Topic
 import os
 
 
-users = [{"id": 1, "username": "user1", "email": "test@email.com" , "password": "password"},
-        {"id": 2, "username": "user2", "email": "test2@email.com", "password": "password"}]
+users = [{"id": 1, "username": "user1", "email": "test@email.com", "password": "password"},
+         {"id": 2, "username": "user2", "email": "test2@email.com", "password": "password"}]
+
 
 class LoginResource(Resource):
     def post(self):
@@ -32,19 +33,22 @@ class LoginResource(Resource):
             # }), 200
             return {"user": user.serialize_with_token(access_token)}, 200
         return {"message": "Invalid credentials"}, 401
-    
+
+
 class ForgotPasswordResource(Resource):
     def post(self):
         data = request.get_json()
         email = data.get('email')
         user = User.query.filter_by(email=email).first()
-        
+
         if user:
-            msg = Message(subject="Password Reset", sender="jossynationworld@gmail.com", recipients=[email])
+            msg = Message(subject="Password Reset",
+                          sender="jossynationworld@gmail.com", recipients=[email])
             code = user.generate_reset_code()
-            url = os.getenv('DOMAIN', 'http://localhost:5000') + f"/reset-password?reset_code={code}"
+            url = os.getenv('DOMAIN', 'http://localhost:5000') + \
+                f"/reset-password?reset_code={code}"
             msg.body = f"Dear {user.username},\n\nHere is your password <a href=\"{url}\">reset link</a>\n\nBest regards,\nYour App Team"
-            
+
             # Send email
             try:
                 mail.send(msg)
@@ -52,7 +56,8 @@ class ForgotPasswordResource(Resource):
             except Exception as e:
                 return {"message": "Failed to send email", "error": str(e)}, 500
         return {"message": "User not found"}, 404
-    
+
+
 class ResetPasswordResource(Resource):
     def post(self):
         code = request.args.get('reset_code')
@@ -60,11 +65,11 @@ class ResetPasswordResource(Resource):
         email = data.get('email')
         new_password = data.get('new_password')
         user = User.query.filter_by(email=email).first()
-        
+
         if user:
             if not user.check_reset_code(code):
                 return {"message": "Invalid reset code"}, 400
-            
+
             user.password_hash = user.get_hashed_password(new_password)
             user.reset_code = None
             user.reset_code_expires_at = None
@@ -72,7 +77,8 @@ class ResetPasswordResource(Resource):
             db.session.commit()
             return {"message": "Password reset successful"}, 200
         return {"message": "User not found"}, 404
-    
+
+
 class RegisterResource(Resource):
     def post(self):
         data = request.get_json()
@@ -85,20 +91,22 @@ class RegisterResource(Resource):
         if User.query.filter_by(username=username).first() or User.query.filter_by(email=email).first():
             return {"message": "User already exists"}, 400
 
-        new_user = User(fullname=fullname, username=username, email=email, password=password)
+        new_user = User(fullname=fullname, username=username,
+                        email=email, password=password)
         if interested_topics_ids:
-            interested_topics = Topic.query.filter(Topic.id.in_(interested_topics_ids)).all()
+            interested_topics = Topic.query.filter(
+                Topic.id.in_(interested_topics_ids)).all()
             new_user.interested_topics.extend(interested_topics)
 
             # topics = Topic.query.filter(Topic.id.in_(interested_topics_ids)).all()
             # new_user.interested_topics = topics
 
-            
         db.session.add(new_user)
         db.session.commit()
 
         return {"message": "User registered successfully"}, 201
-    
+
+
 def check_if_user_is_admin(user_id):
     user = User.query.get(user_id)
     if not user:

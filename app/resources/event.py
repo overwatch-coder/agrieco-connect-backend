@@ -6,21 +6,25 @@ from app.models import Event, User
 from app.cloudinary import upload_image
 from datetime import datetime
 
+
 def parse_datetime(date_str):
-        # Adjust the format as needed. Here, assuming ISO 8601 format.
-        return datetime.fromisoformat(date_str)
+    # Adjust the format as needed. Here, assuming ISO 8601 format.
+    return datetime.fromisoformat(date_str)
+
 
 def parse_time(time_str):
     # Assuming time is in the format 'HH:MMAM/PM'
     return datetime.strptime(time_str, '%I:%M%p').strftime('%I:%M%p')
 
+
 class EventsGETResource(Resource):
     def get(self):
         return [event.serialize() for event in Event.query.all()]
-    
+
+
 class EventsPOSTResource(Resource):
     def post(self):
-        result = jwt_required()(self._post)() 
+        result = jwt_required()(self._post)()
         return result
 
     def _post(self):
@@ -29,16 +33,16 @@ class EventsPOSTResource(Resource):
             event = request.form.to_dict()
             image = request.files.get('image')
             uploaded_image = None
-            
+
             if image:
                 try:
                     image = image.read()
                     uploaded_image = upload_image(image)
-                except: 
+                except:
                     return {"message": "Invalid image"}, 400
-            
+
             price = event.get("price") or 0
-            
+
             start_date = parse_datetime(event["date"])
             start_time = parse_time(event["start_time"])
             end_time = parse_time(event["end_time"])
@@ -54,22 +58,23 @@ class EventsPOSTResource(Resource):
                 location=event["location"],
                 image=uploaded_image
             )
-            
+
             db.session.add(new_event)
             db.session.commit()
             return new_event.serialize(), 201
 
         except Exception as e:
             print("Error: ", e)
-            return {"message": "Invalid request"}, 400    
-    
+            return {"message": "Invalid request"}, 400
+
+
 class EventResource(Resource):
     def get(self, id):
         event = Event.query.get(id)
         if event:
             return event.serialize()
         return None
-    
+
     @jwt_required()
     def put(self, id):
         try:
@@ -91,7 +96,7 @@ class EventResource(Resource):
                         image = image.read()
                         uploaded_image = upload_image(image)
                         _event.image = uploaded_image
-                    except: 
+                    except:
                         return {"message": "Invalid image"}, 400
                 db.session.commit()
                 return _event.serialize(), 200
@@ -99,7 +104,7 @@ class EventResource(Resource):
         except:
             return {"message": "Invalid request"}, 400
 
-    @jwt_required()        
+    @jwt_required()
     def delete(self, id):
         try:
             user_id = get_jwt_identity()
@@ -113,14 +118,16 @@ class EventResource(Resource):
             return jsonify({"message": "Event could not be deleted"}), 500
         except:
             return {"message": "Invalid request"}, 400
-        
+
+
 class EventGETAttendeesResource(Resource):
     def get(self, id):
         event = Event.query.get(id)
         if event:
             return [attendee.serialize() for attendee in event.attendees]
         return None
-    
+
+
 class EventPUTAttendeesResource(Resource):
     @jwt_required()
     def put(self, id):
@@ -131,7 +138,7 @@ class EventPUTAttendeesResource(Resource):
                 user = User.query.get(user_id)
                 if not user:
                     return {"message": "User not found"}, 404
-                
+
                 if user in event.attendees:
                     event.attendees.remove(user)
                 else:

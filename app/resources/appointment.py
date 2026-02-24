@@ -5,9 +5,11 @@ from flask_mail import Message
 from app import db, mail
 from app.models import AppointmentAvailability, User
 
+
 class AppointmentAvailabilityGETResource(Resource):
     def get(self):
         return [availability.serialize() for availability in AppointmentAvailability.query.all()]
+
 
 class AppointmentAvailabilityPOSTResource(Resource):
     def post(self):
@@ -25,11 +27,12 @@ class AppointmentAvailabilityPOSTResource(Resource):
             )
             new_availability.company_name = availability.get("company_name")
             new_availability.location = availability.get("location")
-            new_availability.contact_information = availability.get("contact_information")
+            new_availability.contact_information = availability.get(
+                "contact_information")
             new_availability.bio = availability.get("bio")
             new_availability.specialty = availability.get("specialty")
-            new_availability.experience_level = availability.get("experience_level")
-
+            new_availability.experience_level = availability.get(
+                "experience_level")
 
             db.session.add(new_availability)
             db.session.commit()
@@ -37,7 +40,8 @@ class AppointmentAvailabilityPOSTResource(Resource):
         except Exception as e:
             print("Error: ", e)
             return {"message": "Invalid request"}, 400
-        
+
+
 class AppointmentAvailabilityResource(Resource):
     def get(self, id):
         availability = AppointmentAvailability.query.get(id)
@@ -52,21 +56,25 @@ class AppointmentAvailabilityResource(Resource):
             availability = request.form
 
             availability = AppointmentAvailability.query.get(id)
-            availability.availability_slot_start = availability.get("availabilitySlotStart")
-            availability.availability_slot_end = availability.get("availabilitySlotEnd")
+            availability.availability_slot_start = availability.get(
+                "availabilitySlotStart")
+            availability.availability_slot_end = availability.get(
+                "availabilitySlotEnd")
             availability.company_name = availability.get("company_name")
             availability.location = availability.get("location")
-            availability.contact_information = availability.get("contact_information")
+            availability.contact_information = availability.get(
+                "contact_information")
             availability.bio = availability.get("bio")
             availability.specialty = availability.get("specialty")
-            availability.experience_level = availability.get("experience_level")
+            availability.experience_level = availability.get(
+                "experience_level")
 
             db.session.commit()
             return availability.serialize(), 201
         except Exception as e:
             print("Error: ", e)
             return {"message": "Invalid request"}, 400
-        
+
     @jwt_required()
     def delete(self, id):
         try:
@@ -77,7 +85,7 @@ class AppointmentAvailabilityResource(Resource):
         except Exception as e:
             print("Error: ", e)
             return {"message": "Invalid request"}, 400
-        
+
 
 class AppointmentBookingResource(Resource):
     def get(self, id):
@@ -94,10 +102,10 @@ class AppointmentBookingResource(Resource):
 
             if availability.is_booked:
                 return {"message": "Appointment not available"}, 400
-            
+
             if availability.user_id == user_id:
                 return {"message": "You can't book your own appointment"}, 400
-            
+
             user = User.query.get(availability.user_id).first()
             if not user:
                 return {"message": "User not found"}, 404
@@ -105,11 +113,10 @@ class AppointmentBookingResource(Resource):
             booked_user = User.query.get(user_id).first()
             if not booked_user:
                 return {"message": "User not found"}, 404
-            
+
             availability.is_booked = True
             availability.booked_by = user_id
             db.session.commit()
-
 
             # Send email
             try:
