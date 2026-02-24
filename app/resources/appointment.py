@@ -2,8 +2,8 @@ from flask_restful import Resource
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_mail import Message
-from api.app import db, mail
-from api.app.models import AppointmentAvailability, User
+from app import db, mail
+from app.models import AppointmentAvailability, User
 
 
 class AppointmentAvailabilityGETResource(Resource):

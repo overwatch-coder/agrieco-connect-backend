@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from api.app.resources.feed import FeedResource, FeedsGETResource, FeedCommentsResource, FeedLikesResource, FeedTrendingResource, FeedsGETByTopicResource, CommunityFeedsGETResource
+from app.resources.feed import FeedResource, FeedsGETResource, FeedCommentsResource, FeedLikesResource, FeedTrendingResource, FeedsGETByTopicResource, CommunityFeedsGETResource
 
 bp = Blueprint('api', __name__)
 api = Api(bp)

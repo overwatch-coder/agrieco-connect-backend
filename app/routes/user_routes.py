@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from api.app.resources.user import UserResource, UsersGETResource, UserFollowResource, UserFollowingResource, UserAppointmentsResource
+from app.resources.user import UserResource, UsersGETResource, UserFollowResource, UserFollowingResource, UserAppointmentsResource
 
 bp = Blueprint('user', __name__)
 api = Api(bp)

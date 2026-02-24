@@ -1,9 +1,9 @@
 from flask_restful import Resource
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from api.app import db
-from api.app.models import Event, User
-from api.app.cloudinary import upload_image
+from app import db
+from app.models import Event, User
+from app.cloudinary import upload_image
 from datetime import datetime
 
 

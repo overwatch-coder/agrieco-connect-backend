@@ -2,14 +2,14 @@
 # from flask_restful import Api, MethodNotAllowed, NotFound
 # from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-# from api.app.jwt_errors import jwt
+# from app.jwt_errors import jwt
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_mail import Mail
-# from api.app.config import Config
-# from api.app.util.common import domain, port, prefix, build_swagger_config_json
+# from app.config import Config
+# from app.util.common import domain, port, prefix, build_swagger_config_json
 # from flask_swagger_ui import get_swaggerui_blueprint
-# from api.app.resources.swaggerConfig import SwaggerConfig
+# from app.resources.swaggerConfig import SwaggerConfig
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()

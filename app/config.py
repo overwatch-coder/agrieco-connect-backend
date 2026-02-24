@@ -7,6 +7,6 @@ class Config:
         'DATABASE_URL') or 'postgresql://azadmin:PassJP10%40@justpick-db.postgres.database.azure.com:5432/agriecodb'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PREFIX = '/api'
-    UPLOAD_FOLDER = 'api/app/public/uploads'
+    UPLOAD_FOLDER = 'app/public/uploads'
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
     # HOST = 'https://agrieco-connect-be.azurewebsites.net'

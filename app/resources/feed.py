@@ -2,13 +2,13 @@ from flask_restful import Resource
 from flask import request, jsonify
 from sqlalchemy import func
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from api.app.resources.auth import check_if_user_is_admin
-from api.app import db
-from api.app.models import Feed, Topic, User, Comment
+from app.resources.auth import check_if_user_is_admin
+from app import db
+from app.models import Feed, Topic, User, Comment
 import os
 import re
-from api.app.cloudinary import upload_image
-from api.app.trendingbot import TrendingKeywords
+from app.cloudinary import upload_image
+from app.trendingbot import TrendingKeywords
 from datetime import datetime
 
 # Configure Flask-Uploads

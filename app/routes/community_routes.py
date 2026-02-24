@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from api.app.resources.community import CommunitiesGETResource, CommunityResource, CommunitiesPOSTResource, CommunityGETMembersResource, CommunityPUTMembersResource, CommunityGETMyCommunitiesResource, CommunityFeedsResource
+from app.resources.community import CommunitiesGETResource, CommunityResource, CommunitiesPOSTResource, CommunityGETMembersResource, CommunityPUTMembersResource, CommunityGETMyCommunitiesResource, CommunityFeedsResource
 
 bp = Blueprint('community', __name__)
 api = Api(bp)

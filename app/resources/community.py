@@ -1,8 +1,8 @@
 from flask_restful import Resource
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from api.app import db
-from api.app.models import Community, Feed, User
+from app import db
+from app.models import Community, Feed, User
 
 
 class CommunitiesGETResource(Resource):

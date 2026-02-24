@@ -1,9 +1,9 @@
 import openai
 import json
 from collections import Counter
-from api.app.models import Topic
+from app.models import Topic
 import re
-from api.app.config import Config
+from app.config import Config
 
 # Import the OpenAI API key from the configuration
 openai.api_key = Config.OPENAI_API_KEY

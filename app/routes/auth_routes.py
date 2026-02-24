@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from api.app.resources.auth import LoginResource, RegisterResource, ForgotPasswordResource, ResetPasswordResource
+from app.resources.auth import LoginResource, RegisterResource, ForgotPasswordResource, ResetPasswordResource
 
 bp = Blueprint('auth', __name__)
 api = Api(bp)

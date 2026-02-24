@@ -2,8 +2,8 @@ from flask_restful import Resource
 from flask import request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required
 from flask_mail import Message
-from api.app import db, mail
-from api.app.models import User, Topic
+from app import db, mail
+from app.models import User, Topic
 import os
 
 

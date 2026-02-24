@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from api.app.resources.market import ProductsGETResource, ProductResource, ProductsPOSTResource
+from app.resources.market import ProductsGETResource, ProductResource, ProductsPOSTResource
 
 bp = Blueprint('market', __name__)
 api = Api(bp)

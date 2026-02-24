@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from api.app.resources.appointment import AppointmentAvailabilityGETResource, AppointmentAvailabilityPOSTResource, AppointmentAvailabilityResource, AppointmentBookingResource
+from app.resources.appointment import AppointmentAvailabilityGETResource, AppointmentAvailabilityPOSTResource, AppointmentAvailabilityResource, AppointmentBookingResource
 
 bp = Blueprint('appointment', __name__)
 api = Api(bp)
