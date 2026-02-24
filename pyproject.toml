@@ -1,9 +1,0 @@
-[project]
-name = "agrieco-connect-backend"
-version = "0.1.0"
-description = "Backend for Agrieco Connect"
-requires-python = ">=3.11"
-
-dependencies = [
-   "flask>=3.0.3",
-]
