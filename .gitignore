@@ -11,3 +11,4 @@ docs/_build/
 .env
 .vercel
 venv
+.env*.local
