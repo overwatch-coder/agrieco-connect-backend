@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
-from app import db
-from app.models import User, AppointmentAvailability
+from api.app import db
+from api.app.models import User, AppointmentAvailability
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 

@@ -1,4 +1,4 @@
-from app import db, bcrypt
+from api.app import db, bcrypt
 from datetime import datetime, timedelta
 from random import choice
 

@@ -1,6 +1,6 @@
 from flask import Blueprint
 from flask_restful import Api
-from app.resources.event import EventsGETResource, EventsPOSTResource, EventResource, EventGETAttendeesResource, EventPUTAttendeesResource
+from api.app.resources.event import EventsGETResource, EventsPOSTResource, EventResource, EventGETAttendeesResource, EventPUTAttendeesResource
 
 bp = Blueprint('events', __name__)
 api = Api(bp)

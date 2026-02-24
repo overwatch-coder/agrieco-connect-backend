@@ -1,9 +1,9 @@
 from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import db
+from api.app import db
 from .auth import check_if_user_is_admin
-from app.models import Topic
+from api.app.models import Topic
 
 
 class TopicsGETResource(Resource):

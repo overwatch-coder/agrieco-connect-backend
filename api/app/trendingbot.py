@@ -1,17 +1,18 @@
 import openai
 import json
 from collections import Counter
-from app.models import Topic
+from api.app.models import Topic
 import re
-from app.config import Config
+from api.app.config import Config
 
 # Import the OpenAI API key from the configuration
 openai.api_key = Config.OPENAI_API_KEY
 
+
 class TrendingKeywords:
     def __init__(self):
         pass
-                                                        
+
     def process_text(self, text):
         # Retrieve all topics from the database and extract the names of the topics
         topics = Topic.query.all()
@@ -60,8 +61,7 @@ class TrendingKeywords:
         # Create a dictionary of trending keywords with their counts
         trending_keywords = {keyword: count for keyword, count in most_common}
         return trending_keywords
-    
-    
+
     def get_random_facts(self):
         try:
             response = openai.ChatCompletion.create(
@@ -78,4 +78,3 @@ class TrendingKeywords:
             return response_text
         except Exception as e:
             return "We could not generate a random fact at this time. Please try again later."
-

@@ -1,12 +1,12 @@
 from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import db
+from api.app import db
 import os
 import re
-from app.cloudinary import upload_image
+from api.app.cloudinary import upload_image
 
-from app.models import Product, User
+from api.app.models import Product, User
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 UPLOAD_FOLDER = 'public/uploads/items_images'

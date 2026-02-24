@@ -1,13 +1,13 @@
 from flask import Flask, jsonify, redirect, send_from_directory
 from flask_restful import Api, MethodNotAllowed, NotFound
 from flask_cors import CORS
-from app.jwt_errors import jwt
-from app.config import Config
-from app.util.common import domain, port, prefix, build_swagger_config_json
+from api.app.jwt_errors import jwt
+from api.app.config import Config
+from api.app.util.common import domain, port, prefix, build_swagger_config_json
 from flask_swagger_ui import get_swaggerui_blueprint
-from app.resources.swaggerConfig import SwaggerConfig
-from app.routes import api_routes, auth_routes, topic_routes, market_routes, event_routes, community_routes, user_routes, appointment_routes
-from app import db, bcrypt, migrate, mail
+from api.app.resources.swaggerConfig import SwaggerConfig
+from api.app.routes import api_routes, auth_routes, topic_routes, market_routes, event_routes, community_routes, user_routes, appointment_routes
+from api.app import db, bcrypt, migrate, mail
 
 app = Flask(__name__)
 
